@@ -17,6 +17,7 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -31,6 +32,7 @@ var sumCmd = &cobra.Command{
 	sum 2 3`,
 	Run: func(cmd *cobra.Command, args []string) {
 		sum()
+		fmt.Println(strings.Join(args, " "))
 	},
 }
 
