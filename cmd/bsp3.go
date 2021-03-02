@@ -39,7 +39,3 @@ func waitAndPrint() string {
 	time.Sleep(5 * time.Second)
 	return "Hello World"
 }
-
-func failTest(x, y int) int {
-	return x + y
-}

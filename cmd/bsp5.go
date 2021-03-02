@@ -17,19 +17,38 @@ package cmd
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/spf13/cobra"
 )
+
+var countRace int
 
 // bsp5Cmd represents the bsp5 command
 var bsp5Cmd = &cobra.Command{
 	Use:   "bsp5",
 	Short: "Showcase the Racecondition",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Racecondition needs to be added")
+		fmt.Println("Starting race...")
+		startRace()
+		fmt.Println("Race finished!")
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(bsp5Cmd)
+}
+
+func startRace() {
+	go addOne()
+	go addFive()
+	time.Sleep(5 * time.Second)
+}
+
+func addFive() {
+	countRace += 5
+}
+
+func addOne() {
+	countRace *= 1
 }
