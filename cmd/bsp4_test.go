@@ -14,8 +14,9 @@ func TestSumUp(t *testing.T) {
 	if result != 11 {
 		t.Errorf("This test should fail. Dont worry!")
 	}
+
+	// Replace with te following to fix the test
 	/*
-		// fix the test
 		if result != 10 {
 			t.Errorf("Failed to calculate the sum of 5 and 5")
 		}
