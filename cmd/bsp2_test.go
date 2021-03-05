@@ -15,8 +15,9 @@ func TestPrintHello(t *testing.T) {
 }
 
 func TestPrintWorld(t *testing.T) {
-	if "World" != printWorld() {
-		t.Error("Printing World has failed!")
-	}
-
+	t.Run("subtestPrintWorld", func(t *testing.T) {
+		if "World" != printWorld() {
+			t.Error("Printing World has failed!")
+		}
+	})
 }

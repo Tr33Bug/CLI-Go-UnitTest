@@ -1,7 +1,7 @@
 
 <h1 style="text-align: center"> Funktionsweise des GO-Testing-Tools </h1>
 
-<h4 style="text-align: center">Götz-Henrik Wiegand | Matr.-Nr. 70722</h4>
+<h4 style="text-align: center">Götz-Henrik Wiegand | Matr.</h4>
 
 
 
@@ -47,7 +47,7 @@ Im Rahmen der Projektarbeit wird ein Programm in Go geschrieben, an dem das GO-t
 % Welche Methoden werden getestet bzw. welches Tool wird gezeigt.
 
 Die Programmiersprache Go wurde vor allem für das Entwickeln von skalierbaren Webanwendungen und Cloud Computing entwickelt. Neben diesen Aufgaben, hat sich GO auch als eine gängige Sprache für das Entwickeln von Comand Line Interfaces (CLI) herausgestellt. 
-Mit Hilfe eines selbstgeschriebenen CLIs werden verschiedene Beispiele dargestellt und Möglichkeiten aufgezeigt, die das Go-Testing Tool bereitstellt. Die Entwicklung des Programms sowie die Ausführung der Tests werden mithilfe von Visual Studio Code und der GO-Erweiterung durchgeführt. Für die Programmierung des CLIs werden das Cobra-Framework sowie die GO eigenen Pakete "fmt", "testing" und "strings" genutzt. Alle Testbefehle und Programmausführungen werden über den Terminal ausgeführt und beschrieben. Die Einbettung und Umsetzung in Grafischen Oberflächen wird hier nicht weiter berücksichtigt. 
+Mit Hilfe eines selbstgeschriebenen CLIs[^GitHub_Tr33Bug] werden verschiedene Beispiele dargestellt und Möglichkeiten aufgezeigt, die das Go-Testing Tool bereitstellt. Die Entwicklung des Programms sowie die Ausführung der Tests werden mithilfe von Visual Studio Code und der GO-Erweiterung[^VS Code] durchgeführt. Für die Programmierung des CLIs werden das Cobra-Framework[^GitHub_Cobra] sowie die GO eigenen Pakete[^GO-Packages] "fmt", "testing" und "strings" genutzt. Alle Testbefehle und Programmausführungen werden über den Terminal ausgeführt und beschrieben. Die Einbettung und Umsetzung der Ausführung von Tests in Grafischen Oberflächen wird hier nicht weiter berücksichtigt. 
 
 ### Tests ausführen
 Der erste Tests soll die Funktion `printHelloWorld()` in `./cmd/bsp1.go` testen. Hierfür wurde eine weitere Datei im gleichen Ordner und Paket mit dem Namen `bsp1_test.go` angelegt. Die Funktion `printHelloWorld()` gibt als Rückgabewert einen String mit dem Inhalt "*Hello World*" zurück.
@@ -101,7 +101,11 @@ ok      github.com/Tr33Bug/myCli/cmd    0.162s
 
 ### Spezifische Tests ausführen
 
-Werden nun Änderungen an einer Funktion vorgenommen und man möchte diese anhand der geschriebenen Tests prüfen, ohne alle Tests des gesamten Projektes aus zu führen, so kann man dies über `go test` verknüpft mit dem *run*-Flagg und dem Namen der Testfunktion erreichen. Damit kann man eine Testfunktion nach ihrem Namen aufrufen. 
+Werden nun Änderungen an einer Funktion vorgenommen und man möchte diese anhand der geschriebenen Tests prüfen, ohne alle Tests des gesamten Projektes aus zu führen, so kann man dies über `go test` verknüpft mit dem *run*-Flagg und dem Namen der Testfunktion erreichen. Damit kann man eine oder mehrere Testfunktionen nach ihrem Namen aufrufen.
+
+Es soll aus dem `./cmd/bsp2_test.go` nur die Funktion `TestPrintHello()` ausgeführt werden. Hierfür wird in dem Terminal `go test -run=TestPrintHello$ ./cmd/` verwendet. Das Dollarzeichen am Ende des Namens legt fest, dass GO nach genau diesem Test suchen soll (direkter Aufruf). Lassen wir das Dollarzeichen weg und führen `go test -run=TestPrint ./cmd/` aus, so werden nach allen Tests gesucht, die mit "*TestPrint*" anfangen und dann ausgeführt("beginnt mit" Aufruf). In unserem Beispiel sind in der Ausgabe dann die Testergebnisse beider Tests und des Tests aus dem `./cmd/bsp1_test.go` zu sehen (siehe Ausgabe).
+
+In der `Test Print World()` Funktion wird mit einem Subtest gearbeitet. Diese sind besonders sinnvoll, um komplexere Funktionen zu testen und abzudecken. In diesem Beispiel zu Demonstrationszwecken stark vereinfacht. Auch diese Subtests können über die *run*-Flagg aufgerufen werden. Hierfür wird zuerst der übergeordnete Test und dann mit einem Schrägstrich der Subtest genannt. Auch hier sind wieder "direkte" oder "beginnen mit"-Aufrufe möglich. 
 
 ##### Code
 
@@ -116,13 +120,52 @@ func printWorld() string {
 }
 
 // () aus ./cmd/bsp2_test.go
+func TestPrintHello(t *testing.T) {
+	if "Hello" != printHello() {
+		t.Error("Printing Hello has failed!")
+	}
+
+}
+
+func TestPrintWorld(t *testing.T) {
+	t.Run("subtestPrintWorld", func(t *testing.T) {
+		if "World" != printWorld() {
+			t.Error("Printing World has failed!")
+		}
+	})
+}
 ```
 
 ##### Ausgabe
 
 ```bash
-tr33@bug:~$
+tr33@bug:~$go test -v -run=TestPrintHello$ ./cmd/
+=== RUN   TestPrintHello
+--- PASS: TestPrintHello (0.00s)
+PASS
+ok      github.com/Tr33Bug/myCli/cmd    0.161s
+tr33@bug:~$go test -v -run=TestPrint ./cmd/
+=== RUN   TestPrintHelloWorld
+    bsp1_test.go:11: This Log should only appear in verbose mode or if something went wrong
+--- PASS: TestPrintHelloWorld (0.00s)
+=== RUN   TestPrintHello
+--- PASS: TestPrintHello (0.00s)
+=== RUN   TestPrintWorld
+=== RUN   TestPrintWorld/subtestPrintWorld
+--- PASS: TestPrintWorld (0.00s)
+    --- PASS: TestPrintWorld/subtestPrintWorld (0.00s)
+PASS
+ok      github.com/Tr33Bug/myCli/cmd    0.160s
+tr33@bug:~$go test -v -run=TestPrintWorld$/subtestPrint ./cmd/
+=== RUN   TestPrintWorld
+=== RUN   TestPrintWorld/subtestPrintWorld
+--- PASS: TestPrintWorld (0.00s)
+    --- PASS: TestPrintWorld/subtestPrintWorld (0.00s)
+PASS
+ok      github.com/Tr33Bug/myCli/cmd    0.160s
 ```
+
+
 
 ## bsp3
 
@@ -286,19 +329,17 @@ So bald das Projekt größer wird und damit auch der Umfang der Tests größer w
 % Weitere Möglichkeiten
 % Gesamtdarstellung der Ergebnisse
 
-## Literaturverzeichnis
+[^VS Code]: Visual Studio Code Extension für GO: https://code.visualstudio.com/docs/languages/go
 
-### Links
-VSCode Extension
-https://code.visualstudio.com/docs/languages/go
-packages
-https://golang.org/pkg/
-github repo
-https://github.com/Tr33Bug/myCli
+[^GO-Packages]: Die Dokumentation zum GO-Testing Paket: https://golang.org/pkg/testing/
+
+[^GitHub_Tr33Bug]: Das Repository, in welchem das gesammte Comand Line Interface zu finden ist: https://github.com/Tr33Bug/myCli
+
+[^GitHub_Cobra]: Das Repository, in welchem das Cobra-Tool zur Erstellung von Comand Line Interfaces zu finden ist: https://github.com/spf13/cobra
+
+[^Blog_A.Edwards]: Alex Edwards Blogeintrag über die verschiedenen Tools, die GO mitbringt: https://www.alexedwards.net/blog/an-overview-of-go-tooling
+
 artikel über go \\
 https://entwickler.de/online/development/einfuehrung-programmierung-go-166821.html
-Alex Edwards blog - Tooling in go
-https://www.alexedwards.net/blog/an-overview-of-go-tooling#testing
-cobra tool 
-https://github.com/spf13/cobra
-	
+
+​	
