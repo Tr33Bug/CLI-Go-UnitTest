@@ -3,6 +3,7 @@ package cmd
 // Importieren des Testing-Paketes
 import (
 	"testing"
+	"time"
 )
 
 // Showcase for failing tests
@@ -22,4 +23,11 @@ func TestSumUp(t *testing.T) {
 		}
 	*/
 
+}
+
+func TestRetTrue(t *testing.T) {
+	time.Sleep(4 * time.Second)
+	if !retTrue() {
+		t.Errorf("This should never Fail...")
+	}
 }

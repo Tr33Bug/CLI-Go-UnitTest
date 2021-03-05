@@ -62,3 +62,7 @@ func parseAndIntConv(args []string, place int) (int, error) {
 func sumUp(x, y int) int {
 	return x + y
 }
+
+func retTrue() bool {
+	return true
+}
