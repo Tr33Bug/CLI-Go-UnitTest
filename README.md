@@ -277,6 +277,12 @@ tr33@bug:~$go test -failfast ./cmd/
 
 ## bsp5
 
+Parallelisierbarkeit ist eine der Stärken von GO und auch Tests in GO sind parallelisier bar. Bei parallelen Anwendungen kann es zu sogenannten Wettlaufsituationen(*Race Conditions*) kommen die im häufig sehr schwer zu finden sind. Eine solche "Wettlauf"-Situation entsteht immer dann, wenn einzelne Komponenten die Parallel laufen in ihrer Dauer und Reihenfolge nicht definiert sind und somit bei verschiedenen Ausführungen verschiedene Lösungen herauskommen können. Um einen solchen Fehler schnell zu erkennen kann jedes Programm in GO mit dem *Data Race Detector*[^GO-Packages_DataRaceDetector] ausgeführt werden. Um diesen Detector zu aktivieren muss die *race*-Flagg(`-race`) in dem Kommando enthalten sein. Der *Data Race Detector* kann neben dem Testen auch bei der Ausführung des Programmes (`go run -race main.go`), bei dem Bauen(`go build -race main.go`) und bei dem Installieren(`go install -race main.go`) ausgeführt werden. 
+
+Eine einfache Wettlaufbedingung ist wenn zwei parallele Programme in die gleiche Variable schreiben möchten. Welches Programm später in die Variable schriebt hat seinen Wert als Lösung in dieser festgehalten wobei der vorige Wert verloren geht. Um so ein Beispiel zu kre­ie­ren legen wir zunächst eine Variable an, auf welche die parallelen Tests zugreifen können(`superCount`).  Im folgenden werden zwei Funktionen erstellt, wobei eine Funktion (`countUp()`) die Variable um eins erhöht und eine Funktion (`countDown()`) die Variable um eins erniedrigt. Beide Funktionen werden nach dem Schreibvorgang der Variable ihren Wert als Log ausgeben und in der `TestStartRace()`-Funktion als Untertests(*subtests*) und parallel aufgerufen. 
+
+Der Test wird zunächst mit `go test -run=TestStartRace$ ./cmd/` ohne den *Data Race Detector* aufgerufen und wird fehlerfrei ausgeführt. Wird der *Data Race Detector* nun hinzugefügt(`go test -race -run=TestStartRace$ ./cmd/`) erscheint sofort eine Data-Race-Warnung. In der Warnung werden dem Entwickler weitere Informationen bereitgestellt wie dieser Wettlauf entstanden ist. 
+
 ##### Code
 
 ```go
@@ -298,24 +304,72 @@ func TestStartRace(t *testing.T) {
 }
 
 func countUp(t *testing.T) {
-	superCount := 1
+	superCount++
 	t.Log(superCount)
 }
 
 func countDown(t *testing.T) {
-	superCount := -1
+	superCount--
 	t.Log(superCount)
 }
+
 
 ```
 
 ##### Ausgabe
 
 ```bash
-tr33@bug:~$
+tr33@bug:~$go test -run=TestStartRace$ ./cmd/
+	ok      github.com/Tr33Bug/myCli/cmd    0.297s
+tr33@bug:~$go test -race -run=TestStartRace$ ./cmd/
+	==================
+	WARNING: DATA RACE
+	Read at 0x00000144e8e8 by goroutine 9:
+	  github.com/Tr33Bug/myCli/cmd.countUp()
+	      C:/Users/Tr33Bug/go/myCli/cmd/bsp5_test.go:26 +0x55
+  	github.com/Tr33Bug/myCli/cmd.TestStartRace.func2()
+	      C:/Users/Tr33Bug/go/myCli/cmd/bsp5_test.go:20 +0x45
+	  testing.tRunner()
+	      c:/go/src/testing/testing.go:1123 +0x202
+
+	Previous write at 0x00000144e8e8 by goroutine 8:
+	  github.com/Tr33Bug/myCli/cmd.countDown()
+	      C:/Users/Tr33Bug/go/myCli/cmd/bsp5_test.go:31 +0x71
+	  github.com/Tr33Bug/myCli/cmd.TestStartRace.func1()
+	      C:/Users/Tr33Bug/go/myCli/cmd/bsp5_test.go:15 +0x45
+	  testing.tRunner()
+	      c:/go/src/testing/testing.go:1123 +0x202
+
+	Goroutine 9 (running) created at:
+	  testing.(*T).Run()
+	      c:/go/src/testing/testing.go:1168 +0x5bb
+	  github.com/Tr33Bug/myCli/cmd.TestStartRace()
+	      C:/Users/Tr33Bug/go/myCli/cmd/bsp5_test.go:18 +0x93
+	  testing.tRunner()
+	      c:/go/src/testing/testing.go:1123 +0x202
+
+	Goroutine 8 (running) created at:
+	  testing.(*T).Run()
+	      c:/go/src/testing/testing.go:1168 +0x5bb
+	  github.com/Tr33Bug/myCli/cmd.TestStartRace()
+	      C:/Users/Tr33Bug/go/myCli/cmd/bsp5_test.go:13 +0x64
+	  testing.tRunner()
+	      c:/go/src/testing/testing.go:1123 +0x202
+	==================
+	--- FAIL: TestStartRace (0.00s)
+	    --- FAIL: TestStartRace/raceDown (0.00s)
+	        bsp5_test.go:32: -1
+	    --- FAIL: TestStartRace/raceUp (0.00s)
+	        bsp5_test.go:27: 0
+	        testing.go:1038: race detected during execution of test
+	FAIL
+	FAIL    github.com/Tr33Bug/myCli/cmd    0.047s
+	FAIL
 ```
 
 ## bsp6
+
+Es gibt Funktionen, die nach einer erneuten Durchführung einen anderen Wert zurückgeben. Ein einfaches Beispiel dafür wäre eine Abhängigkeit von einer Wahrscheinlichkeit. Wird der Test für so eine Funktion mehrmals ausgeführt, so wird unser Test immer positiv ausfallen, wenn nichts an dem Code geändert wurde, da GO die Testergebnisse in einem Cache speichert. Mit der 
 
 ##### Code
 
@@ -373,10 +427,10 @@ So bald das Projekt größer wird und damit auch der Umfang der Tests größer w
 
 [^VS Code]: Visual Studio Code Extension für GO: https://code.visualstudio.com/docs/languages/go
 
-[^GO-Packages]: Die Dokumentation zum GO-Testing Paket: https://golang.org/pkg/testing/
+[^GO-Packages_Testing]: Die Dokumentation zum GO-Testing Paket: https://golang.org/pkg/testing/
 
+[^GO-Packages_DataRaceDetector]: Die Dokumentation zum GO-Data-Race-Detector Paket: https://golang.org/doc/articles/race_detector
 [^GitHub_Tr33Bug]: Das Repository, in welchem das gesammte Comand Line Interface zu finden ist: https://github.com/Tr33Bug/myCli
-
 [^GitHub_Cobra]: Das Repository, in welchem das Cobra-Tool zur Erstellung von Comand Line Interfaces zu finden ist: https://github.com/spf13/cobra
 
 [^Blog_A.Edwards]: Alex Edwards Blogeintrag über die verschiedenen Tools, die GO mitbringt: https://www.alexedwards.net/blog/an-overview-of-go-tooling

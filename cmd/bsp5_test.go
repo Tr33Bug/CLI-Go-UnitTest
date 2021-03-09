@@ -23,11 +23,11 @@ func TestStartRace(t *testing.T) {
 }
 
 func countUp(t *testing.T) {
-	superCount := 1
+	superCount++
 	t.Log(superCount)
 }
 
 func countDown(t *testing.T) {
-	superCount := -1
+	superCount--
 	t.Log(superCount)
 }
