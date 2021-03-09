@@ -275,7 +275,7 @@ tr33@bug:~$go test -failfast ./cmd/
 	FAIL
 ```
 
-## bsp5
+## Erkennen von Wettlaufsituationen(Race Conditions)
 
 Parallelisierbarkeit ist eine der Stärken von GO und auch Tests in GO sind parallelisier bar. Bei parallelen Anwendungen kann es zu sogenannten Wettlaufsituationen(*Race Conditions*) kommen die im häufig sehr schwer zu finden sind. Eine solche "Wettlauf"-Situation entsteht immer dann, wenn einzelne Komponenten die Parallel laufen in ihrer Dauer und Reihenfolge nicht definiert sind und somit bei verschiedenen Ausführungen verschiedene Lösungen herauskommen können. Um einen solchen Fehler schnell zu erkennen kann jedes Programm in GO mit dem *Data Race Detector*[^GO-Packages_DataRaceDetector] ausgeführt werden. Um diesen Detector zu aktivieren muss die *race*-Flagg(`-race`) in dem Kommando enthalten sein. Der *Data Race Detector* kann neben dem Testen auch bei der Ausführung des Programmes (`go run -race main.go`), bei dem Bauen(`go build -race main.go`) und bei dem Installieren(`go install -race main.go`) ausgeführt werden. 
 
@@ -367,9 +367,23 @@ tr33@bug:~$go test -race -run=TestStartRace$ ./cmd/
 	FAIL
 ```
 
-## bsp6
+## Der Testing Cache und Stress-Testing
 
-Es gibt Funktionen, die nach einer erneuten Durchführung einen anderen Wert zurückgeben. Ein einfaches Beispiel dafür wäre eine Abhängigkeit von einer Wahrscheinlichkeit. Wird der Test für so eine Funktion mehrmals ausgeführt, so wird unser Test immer positiv ausfallen, wenn nichts an dem Code geändert wurde, da GO die Testergebnisse in einem Cache speichert. Mit der 
+Es gibt Funktionen, die nach einer erneuten Durchführung einen anderen Wert zurückgeben. Ein einfaches Beispiel dafür wäre eine Funktion mit einer Abhängigkeit von einer Wahrscheinlichkeit. Wird der Test nun ein mal ausgeführt und schlägt nicht fehl, so wird das Ergebnis in einem Cache gespeichert und bei erneuter Ausführung unter den gleichen Bedingungen(keine Änderung am Code des Paketes) wird der Test immer positiv ausfallen. Im normalen Fall ist das ein erheblicher Vorteil, da es Testvorgänge um ein vielfaches beschläunigen kann und nur die Tests neu ausführt, die sich verändert haben. In einem Fall wie oben beschrieben kann dies aber zu einer falschen Annahme führen, dass alle Funktionen immer den richtigen Wert liefern. 
+
+Soll der Cache geleert werden, damit das gesammte Projekt neu getestet wird, kann eine Leerung mit dem `go clean -testcache` erreicht werden. 
+
+Eine weitere Möglichkeit einen oder alle Tests komplett neu ausführen zu lassen, ist das Stress-Testing. Beim Stress-Testing wird der Test viele male ausgeführt um bewusst zu Testen, ob Funktionen bei erneuter Ausführung das erwartete Ergebnis liefern. Bei dem Stresstesting ist es unerlässlich die Ergebnisse nicht zu Cachen und jedes mal neu auszuführen. 
+
+Wie oft die Tests durchgeführt werden, wird über die *count*-Flagg geregelt. Mit dieser kann ich mit `-count=1` den Test einfach noch einmal durchführen ohne das das Ergebnis aus dem Cache genommen wird oder ich setze höhere Zahlen wie `-count=1000` um meinen Code wirklich einem Stress-Test aus zu setzen. 
+
+Das Beispiel aus `./cmd/bsp6.go`  zeigt eine Funktion die zufällig einen der Strings aus dem String-Array `answers` zurückgibt. Der entsprechende Test dazu in der `./cmd/bsp6_test.go`-Datei überprüft ob die Funktion `"Hello"` zurück gibt. 
+
+In dem ersten Testfall geht der Test ohne Fehlschlag durch, wie in der Ausgabe zu sehen ist. Bei erneuter Ausführung bekommen wir ebenfalls ein fehlerfreien Durchgang und statt der erwarteten Dauer, die der Test benötigt ein `(cached)` zurück.  Um nun den Test noch ein mal ohne Cache ausführen zu lassen wird ein `-count=1` dem Testbefehl hinzugefügt. In diesem Fall ist das Ergebniss der nächsten Ausführung wieder fehlerfrei, braucht aber etwas länger und ist wie erwünscht nicht aus dem Cache. 
+
+Um zu Zeigen das es wirklich Fehler geben kann, soll nun der Test 10mal ausgeführt werden. In der Ausgabe im verbose-Modus ist zu sehen wie oft der Test fehlgeschlagen bzw. erfolgreich verlaufen ist. In dem Beispiel ist der Test nur vier mal erfolgreich ausgeführt worden. 
+
+
 
 ##### Code
 
@@ -404,12 +418,51 @@ func TestRandomReturnHello(t *testing.T) {
 ##### Ausgabe
 
 ```bash
-tr33@bug:~$
+tr33@bug:~$go test -run=TestRandomReturnHello$ ./cmd/
+	ok      github.com/Tr33Bug/myCli/cmd    0.063s
+tr33@bug:~$go test -run=TestRandomReturnHello$ ./cmd/
+	ok      github.com/Tr33Bug/myCli/cmd    (cached)
+tr33@bug:~$go test -count=1 -run=TestRandomReturnHello$ ./cmd/
+	ok      github.com/Tr33Bug/myCli/cmd    0.072s
+tr33@bug:~$go test -v -count=10 -run=TestRandomReturnHello$ ./cmd/
+	=== RUN   TestRandomReturnHello
+	    bsp6_test.go:13: The test failed, probably try out one more time...
+	--- FAIL: TestRandomReturnHello (0.00s)
+	=== RUN   TestRandomReturnHello
+	--- PASS: TestRandomReturnHello (0.00s)
+	=== RUN   TestRandomReturnHello
+	--- PASS: TestRandomReturnHello (0.00s)
+	=== RUN   TestRandomReturnHello
+	--- PASS: TestRandomReturnHello (0.00s)
+	=== RUN   TestRandomReturnHello
+	--- PASS: TestRandomReturnHello (0.00s)
+	=== RUN   TestRandomReturnHello
+	    bsp6_test.go:13: The test failed, probably try out one more time...
+	--- FAIL: TestRandomReturnHello (0.00s)
+	=== RUN   TestRandomReturnHello
+	    bsp6_test.go:13: The test failed, probably try out one more time...
+	--- FAIL: TestRandomReturnHello (0.00s)
+	=== RUN   TestRandomReturnHello
+	    bsp6_test.go:13: The test failed, probably try out one more time...
+	--- FAIL: TestRandomReturnHello (0.00s)
+	=== RUN   TestRandomReturnHello
+	    bsp6_test.go:13: The test failed, probably try out one more time...
+	--- FAIL: TestRandomReturnHello (0.00s)
+	=== RUN   TestRandomReturnHello
+	    bsp6_test.go:13: The test failed, probably try out one more time...
+	--- FAIL: TestRandomReturnHello (0.00s)
+	FAIL
+	FAIL    github.com/Tr33Bug/myCli/cmd    0.073s
+	FAIL
 ```
 
-So bald das Projekt größer wird und damit auch der Umfang der Tests größer wird, sollte man nicht bei jedem Testdurchlauf alle 
+### Darstellung der Testergebnisse als JSON
 
-### Verarbeiten von Testausgaben
+Alle durchgeführten Tests in dieser Arbeit wurden im Terminal mit Konsolen-befehlen ausgeführt und die Ergebnisse auf diesem als Text in dem GO-eigenen Format wieder gegeben. Sollen Testergebnisse jedoch in weiteren Schritten von anderen Programmen gelesen werden, so bietet sich das *JSON*-Format an. Um die Testergebnisse in diesem Format dazustellen wird die *json*-Flagg dem Testbefehl hhinzugefügt. (`go test -json main.go`)
+
+### Erstellen einer ausführbaren Testdatei
+
+`go test -o myTest main.go`
 
 
 
