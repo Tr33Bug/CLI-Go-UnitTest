@@ -1,0 +1,33 @@
+Abstract ======================
+% Worum geht es?
+% Wie bist du vorgegangen?
+% Was sind deine wichtigsten Ergebnisse?
+% Was bedeuten deine Ergebnisse?
+
+
+
+bsp1: --> Ausführen von allen Tests und zeigen von Informationen (verbose-Flag)
+bsp2: --> Einen speziefischen Test ausführen
+bsp3: --> Short-Mode und Skippen von langen Tests
+bsp4: --> Tests die Fehlschalgen
+bsp5: --> Racecondition sowohl im Programm selber als auch im Test (race-Flag)
+bsp6: --> Stresstesting bzw. Tests mehrfach ausführen und Test Cache
+
+Einleitung ========================
+
+% ca. 1 Seite
+% Was wird in der Arbeit behandelt?
+% Was der Kontext/Der Rahmen der Arbeit
+
+
+% Hintergrund und Einordnung
+% Motivation
+% Relevanz der Fragestellung
+% Abgrenzung
+
+% Haubteil
+
+Material und Methoden ==========================
+% Wie bin ich vorgegangen? 
+% Was habe ich genutzt? (Prgramme und co.)
+% Welche Methoden werden getestet bzw. welches Tool wird gezeigt.
