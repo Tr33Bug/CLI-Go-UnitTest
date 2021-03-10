@@ -5,29 +5,14 @@ import (
 	"testing"
 )
 
-// Showcase for raceconditions in tests
-var superCount int
+// Showcase for stress testing
 
-func TestStartRace(t *testing.T) {
-	// Start subtest
-	t.Run("raceDown", func(t *testing.T) {
-		t.Parallel()
-		countDown(t)
-	})
-	// Start second subtest
-	t.Run("raceUp", func(t *testing.T) {
-		t.Parallel()
-		countUp(t)
-	})
+func TestRandomReturnHello(t *testing.T) {
+	answer := randomReturnHello()
+	if answer != "..." {
+		t.Errorf("The test failed, probably try out one more time...")
+	}
 
 }
 
-func countUp(t *testing.T) {
-	superCount++
-	t.Log(superCount)
-}
-
-func countDown(t *testing.T) {
-	superCount--
-	t.Log(superCount)
-}
+// go test -v -run=^TestRandomReturn -count=100 .\cmd\

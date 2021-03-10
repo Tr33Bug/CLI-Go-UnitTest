@@ -1,5 +1,5 @@
 /*
-Copyright © 2021 Tr33Bug <Tr33@gmx.com>
+Copyright © 2021 NAME HERE <EMAIL ADDRESS>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,38 +17,37 @@ package cmd
 
 import (
 	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/spf13/cobra"
 )
 
-var countRace int
-
-// bsp5Cmd represents the bsp5 command
-var bsp5Cmd = &cobra.Command{
-	Use:   "bsp5",
-	Short: "Showcase the Racecondition",
+// bsp6Cmd represents the bsp6 command
+var bsp6Cmd = &cobra.Command{
+	Use:   "bsp6",
+	Short: "",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Starting race...")
-		startRace()
-		fmt.Println("Race finished!")
+		fmt.Println(randomReturnHello())
+
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(bsp5Cmd)
+	rootCmd.AddCommand(bsp6Cmd)
 }
 
-func startRace() {
-	go addOne()
-	go addFive()
-	time.Sleep(5 * time.Second)
-}
+func randomReturnHello() string {
+	rand.Seed(time.Now().UnixNano())
+	answers := []string{
+		"...",
+		"Hello",
+		"Hello",
+		"...",
+		"...",
+	}
 
-func addFive() {
-	countRace += 5
-}
+	// return answers[rand.Intn(len(answers))]
+	return answers[rand.Intn(len(answers))]
 
-func addOne() {
-	countRace *= 1
 }
