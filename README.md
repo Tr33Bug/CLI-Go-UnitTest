@@ -17,17 +17,15 @@
 ___
 ##### Zusammenfassung
 
-Der gezielte Einsatz von Tests in der Entwicklung kann viele Probleme und Stunden sparen und doch scheuen sich viele Entwickler davor Tests zu Schreiben und diese in ihren Entwicklungsprozess früh mit ein zu binden. Damit in der GO-Programmiersprache Entwickler eine kleinere Hürde haben Tests zu schreiben und ihre Programme mit Tests zu analysieren, haben sich einige sehr hilfreiche Mechanismen und Werkzeuge in dem Test-Tool entwickelt. 
+Der gezielte Einsatz von Tests in der Entwicklung kann viele Probleme und Stunden sparen und doch scheuen sich viele Entwickler davor, Tests zu schreiben und diese in ihren Entwicklungsprozess früh mit ein zu binden. Damit in der GO-Programmiersprache Entwickler eine kleinere Hürde haben, Tests zu schreiben und ihre Programme mit Tests zu analysieren, wurden einige sehr hilfreiche Mechanismen und Werkzeuge in dem Test-Tool implementiert.
 
 Für die Präsentation und Erklärung dieser wurde ein Command-Line-Interface(CLI)[^GitHub_Tr33Bug] mit dem Cobra-Framework[^GitHub_Cobra] erstellt in dem für die verschiedenen, in der Projektarbeit behandelten, GO-Tools entsprechende Beispiele implementiert wurden. Für jedes Beispiel wird der entsprechende Code präsentiert und die Ausgabe im Terminal dokumentiert. Alle in der Projektarbeit gezeigten Beispiele sind nur mit den GO-eigenen Tools sowie einer Kommandozeile und einem Webbrowser ausführbar. 
 
 Ziel der Projektarbeit ist es, eine einsteigerfreundliche Übersicht über die Thematik zu geben und an die Ausführung und Analyse von Tests in GO heranzuführen. 
 
-keine Benchmarks
-
 ---
 ## Einleitung
-Im Rahmen der Projektarbeit wird ein Programm in Go geschrieben, an dem das GO-test-Tool vorgestellt werden soll. Hierfür werden gängige Testmehtoden wie z.b. Unit-Tests gezeigt und wie diese in GO umgesetzt werden können. 
+Im Rahmen der Projektarbeit wird ein Programm in Go geschrieben, an dem das GO-test-Tool vorgestellt werden soll. Hierfür werden gängige Testmethoden wie z.b. Unit-Tests gezeigt und wie diese in GO umgesetzt werden können. 
 
 
 ## Material und Methoden
@@ -38,7 +36,7 @@ Im Folgenden werden mehrere *Flags* besprochen. Flags sind Parameter die in der 
 
 ## Testausführung
 
-Im folgenden Abschnitt werden verschiedene Möglichkeiten und Arten der Testausführung gezeigt und an Codeabschnitten durchgeführt. In jedem Abschnitt wird der entsprechende *Code* der Tests präsentiert und die schrittweise Ausführung im Terminal als *Ausgabe* dokumentiert. 
+Im folgenden Abschnitt werden verschiedene Möglichkeiten und Arten wie Tests in GO ausgeführt werden können gezeigt. Es werden verschiedene Parameter und Möglichkeiten besprochen und an Codebeispielen ausgeführt. Der gesamte Code zu dieser Arbeit befindet sich in einem Repository auf Github[^GitHub_Tr33Bug]. In jedem Abschnitt wird der entsprechende *Code* der Tests präsentiert und die schrittweise Ausführung im Terminal als *Ausgabe* dokumentiert. 
 
 ### Allgemein
 
@@ -95,7 +93,7 @@ Es soll aus dem `./cmd/bsp2_test.go` nur die Funktion `TestPrintHello()` ausgef�
 
 In der `Test Print World()` Funktion wird mit einem Subtest gearbeitet. Diese sind besonders sinnvoll, um komplexere Funktionen zu testen und abzudecken. In diesem Beispiel zu Demonstrationszwecken stark vereinfacht. Auch diese Subtests können über die *run*-Flag aufgerufen werden. Hierfür wird zuerst der übergeordnete Test und dann mit einem Schrägstrich der Subtest genannt. Auch hier sind wieder "direkte" oder "beginnen mit"-Aufrufe möglich. 
 
-Für weitere Informationen zu zum Beispiel Regulären Ausdrücken siehe https://golang.org/pkg/testing/#hdr-Skipping. 
+Für weitere Informationen zu zum Beispiel Regulären Ausdrücken siehe https://golang.org/pkg/testing/ in dem Kapitel "Subtests and Sub-benchmarks". 
 
 ##### Code
 
@@ -159,7 +157,7 @@ tr33@bug:~$go test -v -run=TestPrintWorld$/subtestPrint ./cmd/
 
 ### Tests im Short-Modus ausführen
 
-In GO gibt es die Möglichkeit Tests in einem Short-Modus aus zu führen. Hat ein Projekt sehr komplexe Tests, die viel Zeit brauchen um ausgeführt zu werden, so bietet es sich an bei der Testentwicklung darauf schon Rücksicht zu nehmen und besonders lange Tests in dem Short-Modus zu überspringen. 
+In GO gibt es die Möglichkeit, Tests in einem Short-Modus aus zu führen. Hat ein Projekt sehr komplexe Tests, die viel Zeit brauchen, um ausgeführt zu werden, so bietet es sich an, bei der Testentwicklung darauf schon Rücksicht zu nehmen und besonders lange Tests in dem Short-Modus zu überspringen. 
 
 Die Funktion `testing.Short()` gibt einen Boolean-Wert zurück der `true` ist, sollte der Test in diesem Modus aufgerufen worden sein. Nun lassen sich damit verschiedene Abhängigkeiten erstellen. In diesem Beispiel wird die `t.Skip()`-Funktion ausgeführt, die den Test im Short-Modus überspringt. 
 
@@ -208,9 +206,11 @@ tr33@bug:~$go test -v -run=TestWaitAndPrint$ ./cmd/
 
 ### Umgang mit fehlschlagenden Tests
 
-Tests sind dafür da, in einem Fehlerfall fehlzuschlagen. Das kann den Entwicklern viel Leid ersparen, da bei einer einheitlichen Teststruktur sehr schnell das Problem gefunden werden kann. Wird ein Testdurchlauf gestartet, so werden alle Tests durchgeführt und am Ende zusammengefasst, welche fehlgeschlagen sind. Bei einem Projekt mit vielen und auch umfangreichen Tests kann das sehr lange dauern, selbst wenn der erste oder zweite Test fehlschlägt und man damit vielleicht schon die nötigen Informationen für die Korrektur oder Verbesserung hat
+Tests sind dafür da, in einem Fehlerfall fehlzuschlagen. Das kann den Entwicklern viel Leid ersparen, da bei einer einheitlichen Teststruktur sehr schnell das Problem gefunden werden kann. Wird ein Testdurchlauf gestartet, werden alle Tests durchgeführt und am Ende zusammengefasst, welche fehlgeschlagen sind. Bei einem Projekt mit vielen und auch umfangreichen Tests kann das sehr lange dauern, selbst wenn der erste oder zweite Test fehlschlägt und damit vielleicht schon die nötigen Informationen für die Korrekturen oder Verbesserungen vorliegen.
 
-Um die Tests nach dem ersten Fehlschlag zu stoppen, wird das *failfast*-Flag verwendet. In dem vierten Beispiel(`./cmd/bsp4_test.go`) ist ein Test Angegeben, der in der so vorhandenen Implementierung fehlschlägt. In der `./cmd/bsp4_test.go`-Datei ist nach dem fehlschlagenden Test ein zweiter Test implementiert, der 4 Sekunden warten soll um ein komplexeren langen Test zu simulieren.  Bei der Ausführung der Tests ohne das *failfast*-Flag schlägt der Durchlauf nach ca.9 Sekunden fehl. Mit dem *failfast*-Flag bricht der Durchlauf sofort bei einem Fehlschlag ab und braucht damit nur ca. 5 Sekunden. Je nach Anwendungsfall muss auch hier entschieden werden, on das schnelle Fehlschlagen gewünscht ist. 
+Um die Tests nach dem ersten Fehlschlag zu stoppen, wird das *failfast*-Flag verwendet. In dem vierten Beispiel(`./cmd/bsp4_test.go`) ist ein Test Implementiert, der in der in jedem fall fehlschlagen sollte. In der `./cmd/bsp4_test.go`-Datei ist nach dem fehlschlagenden Test ein zweiter Test implementiert, der 4 Sekunden warten soll um ein komplexeren langen Test zu simulieren.  
+
+Bei der Ausführung der Tests ohne das *failfast*-Flag schlägt der Durchlauf nach ca.9 Sekunden fehl. Mit dem *failfast*-Flag bricht der Durchlauf sofort bei einem Fehlschlag ab und braucht damit nur ca. 5 Sekunden. Je nach Anwendungsfall muss auch hier entschieden werden, ob das schnelle Fehlschlagen gewünscht ist oder nicht.
 
 ##### Code
 
@@ -253,19 +253,19 @@ tr33@bug:~$go test -failfast ./cmd/
 
 ### Zwischengespeicherte Tests und mehrfaches Ausführen von Tests
 
-Es gibt Funktionen, die nach einer erneuten Durchführung einen anderen Wert zurückgeben. Ein einfaches Beispiel dafür wäre eine Funktion mit einer Abhängigkeit von einer Wahrscheinlichkeit. Wird der Test nun ein mal ausgeführt und schlägt nicht fehl, so wird das Ergebnis in einem Cache gespeichert und bei erneuter Ausführung unter den gleichen Bedingungen(keine Änderung am Code des Paketes) wird der Test immer positiv ausfallen. Im normalen Fall ist das ein erheblicher Vorteil, da es Testvorgänge um ein vielfaches beschläunigen kann und nur die Tests neu ausführt, die sich verändert haben. In einem Fall wie oben beschrieben kann dies aber zu einer falschen Annahme führen, dass alle Funktionen immer den richtigen Wert liefern. 
+Es gibt Funktionen, die nach einer erneuten Durchführung einen anderen Wert zurückgeben. Ein einfaches Beispiel dafür wäre eine Funktion mit einer Abhängigkeit von einer Wahrscheinlichkeit. Wird der Test nun ein Mal ausgeführt und schlägt nicht fehl, so wird das Ergebnis in einem Cache gespeichert und bei erneuter Ausführung unter den gleichen Bedingungen(keine Änderung am Code des Paketes) wird der Test immer positiv ausfallen. Im normalen Fall ist das ein erheblicher Vorteil, da es Testvorgänge um ein Vielfaches beschleunigen kann und nur die Tests neu ausführt, die sich verändert haben. In einem Fall wie oben beschrieben, kann dies aber zu einer falschen Annahme führen, dass alle Funktionen immer den richtigen Wert liefern
 
-Soll der Cache geleert werden, damit das gesammte Projekt neu getestet wird, kann eine Leerung mit dem `go clean -testcache` erreicht werden. 
+Soll der Cache geleert werden, damit das gesamte Projekt neu getestet wird, kann eine Leerung mit dem `go clean -testcache` erreicht werden. 
 
-Eine weitere Möglichkeit einen oder alle Tests komplett neu ausführen zu lassen, ist das Stress-Testing. Beim Stress-Testing wird der Test viele male ausgeführt um bewusst zu Testen, ob Funktionen bei erneuter Ausführung das erwartete Ergebnis liefern. Bei dem Stresstesting ist es unerlässlich die Ergebnisse nicht zu Cachen und jedes mal neu auszuführen. 
+Eine weitere Möglichkeit, einen oder alle Tests komplett neu ausführen zu lassen, ist das Stress-Testing. Beim Stress-Testing wird der Test viele male ausgeführt, um bewusst zu Testen, ob Funktionen bei erneuter Ausführung das erwartete Ergebnis liefern. Bei dem Stress-Testing ist es unerlässlich, die Ergebnisse nicht aus dem Cache zu laden, sondern diese jedes Mal neu auszuführen.
 
-Wie oft die Tests durchgeführt werden, wird über die *count*-Flag geregelt. Mit dieser kann ich mit `-count=1` den Test einfach noch einmal durchführen ohne das das Ergebnis aus dem Cache genommen wird oder ich setze höhere Zahlen wie `-count=1000` um meinen Code wirklich einem Stress-Test aus zu setzen. 
+Wie oft die Tests durchgeführt werden, wird über die *count*-Flag geregelt. Mit dieser wird der Test mit `-count=1` noch einmal aufgerufen, ohne dass das Ergebnis aus dem Cache genommen wird. Soll der Test viele Male ausgeführt werden, wird der Counter auf eine höhere Zahlen wie `-count=1000` gesetzt. 
 
-Das Beispiel aus `./cmd/bsp5.go`  zeigt eine Funktion die zufällig einen der Strings aus dem String-Array `answers` zurückgibt. Der entsprechende Test dazu in der `./cmd/bsp5_test.go`-Datei überprüft ob die Funktion `"Hello"` zurück gibt. 
+Das Beispiel aus `./cmd/bsp5.go`  zeigt eine Funktion, die zufällig einen der Strings aus dem String-Array `answers` zurückgibt. Der entsprechende Test dazu in der `./cmd/bsp5_test.go`-Datei überprüft ob die Funktion den String `"Hello"` zurück gibt. 
 
-In dem ersten Testfall geht der Test ohne Fehlschlag durch, wie in der Ausgabe zu sehen ist. Bei erneuter Ausführung bekommen wir ebenfalls ein fehlerfreien Durchgang und statt der erwarteten Dauer, die der Test benötigt ein `(cached)` zurück.  Um nun den Test noch ein mal ohne Cache ausführen zu lassen wird ein `-count=1` dem Testbefehl hinzugefügt. In diesem Fall ist das Ergebniss der nächsten Ausführung wieder fehlerfrei, braucht aber etwas länger und ist wie erwünscht nicht aus dem Cache. 
+In dem ersten Testfall geht der Test ohne Fehlschlag durch, wie in der Ausgabe zu sehen ist. Bei erneuter Ausführung läuft der Test erneut fehlerfrei durch und statt der erwarteten Dauer, die der Test benötigt erscheint dort ein `(cached)` was verdeutlicht, dass das Ergebnis aus dem Cache geladen wurde und der Test nicht wirklich erneut ausgeführt wurde. Um nun den Test noch ein mal ohne Cache ausführen zu lassen wird ein `-count=1` dem Testbefehl hinzugefügt. In diesem Fall ist das Ergebnis der nächsten Ausführung wieder fehlerfrei, braucht aber etwas länger und ist nicht aus dem Cache geladen worden.
 
-Um zu Zeigen das es wirklich Fehler geben kann, soll nun der Test 10mal ausgeführt werden. In der Ausgabe im verbose-Modus ist zu sehen wie oft der Test fehlgeschlagen bzw. erfolgreich verlaufen ist. In dem Beispiel ist der Test nur vier mal erfolgreich ausgeführt worden. 
+Um zu Zeigen, das es wirklich Fehler geben kann, soll nun der Test zehnmal ausgeführt werden. In der Ausgabe im ausführlichen Modus ist zu sehen, wie oft der Test fehlgeschlagen und erfolgreich verlaufen ist. In dem Beispiel ist der Test nur viermal erfolgreich ausgeführt worden. 
 
 
 
@@ -341,8 +341,8 @@ tr33@bug:~$go test -v -count=10 -run=TestRandomReturnHello$ ./cmd/
 ```
 ### Timeout setzen
 
-Um zu verhindern, dass sich ein Test aufhängt gibt es die Möglichkeit einen *Timeout* zu setzten. Das ist eine Zeit, die der Test wartet, bis er Abbricht wenn er keine Rückmeldung bekommt. Der *Timeout* wird über eine weiter Flag gesetzt(`-timeout [Zeit]`). Die Flag braucht als Argument eine Zeitangabe, die mit der `time.ParseDuration()`-Funktion[^GO-Packages_ParseDuration] gelesen werden können (Beispielsweise 30s oder 5ms). 
-Es empfielt sich dieses *Timeout* bei automatisierten Testdurchläufen zu setzen, da dort oft die einzelnen Tests nicht ersichtlich sind und somit Fehlerquellen leichter gefunden werden.
+Um zu verhindern, dass sich ein Test aufhängt, gibt es die Möglichkeit, einen *Timeout* zu setzten. Das ist eine Zeit, die der Test wartet, bis dieser vom System abgebrochen wird, wenn er keine Rückmeldung bekommt. Der *Timeout* wird über eine weiter Flag gesetzt(`-timeout [Zeit]`). Die Flag braucht als Argument eine Zeitangabe, die mit der `time.ParseDuration()`-Funktion[^GO-Packages_ParseDuration] gelesen werden kann(Beispielsweise 30s oder 5ms). 
+Es empfiehlt sich dieses *Timeout* bei automatisierten Testdurchläufen zu setzen, da dort oft die einzelnen Tests nicht ersichtlich sind und somit Fehlerquellen leichter gefunden werden können.
 
 ##### Ausgabe
 
@@ -350,7 +350,11 @@ Es empfielt sich dieses *Timeout* bei automatisierten Testdurchläufen zu setzen
 tr33@bug:~$go test -timeout 20s ./cmd/
 ```
 
+
+
 ## Testanalyse
+
+Bei der Analyse von Tests geht es darum mithilfe von Tests aussagen über die Stabilität des Codes zu treffen oder die Aussagen der Tests für andere Programme oder Menschen darzustellen. Die hier aufgeführten Möglichkeiten sind alle eng an das Testing-Tool geknüpft und so ausgewählt. Einen breiten Teil der Testanalyse behandelt das Benchmarking, welches an dieser Stelle vernachlässigt wird. In jedem Abschnitt wird die entsprechende schrittweise Ausführung als *Ausgabe* im Terminal dokumentiert, wobei der *Code* an dieser Stelle nur bei dem *Erkennen von Wettlaufsituationen* zum Verständnis beigefügt wurde. 
 
 ### Erkennen von Wettlaufsituationen(Race Conditions)
 
@@ -539,12 +543,12 @@ tr33@bug:~$go tool cover -html=myCoverProfile
 
 [^GO-Packages_DataRaceDetector]: Die Dokumentation zum GO-Data-Race-Detector Paket: https://golang.org/doc/articles/race_detector
 [^GO-Packages_ParseDuration]: Die Dokumentation zum GO-Time Paket mit dem der ParseDuration-Funktion https://golang.org/pkg/time/#ParseDuration
-[^GitHub_Tr33Bug]: Das Repository, in welchem das gesammte Command Line Interface zu finden ist: https://github.com/Tr33Bug/myCli
+[^GitHub_Tr33Bug]: Das Repository, in welchem das gesamte Command Line Interface zu finden ist: https://github.com/Tr33Bug/myCli
 [^GitHub_Cobra]: Das Repository, in welchem das Cobra-Tool zur Erstellung von Command Line Interfaces zu finden ist: https://github.com/spf13/cobra
 
 [^Blog_A.Edwards]: Alex Edwards Blogeintrag über die verschiedenen Tools, die GO mitbringt: https://www.alexedwards.net/blog/an-overview-of-go-tooling
 
-artikel über go \\
+Artikel über GO \\
 https://entwickler.de/online/development/einfuehrung-programmierung-go-166821.html
 
 ​	
