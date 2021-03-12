@@ -1,6 +1,6 @@
-<h1 style="text-align: center">Einstieg in die Testausführung und Testanalyse in GO </h1>
+<h1 style="text-align: center">Einstieg in die Ausführung und Analyse von Tests in GO </h1>
 
-<h4 style="text-align: center">Götz-Henrik Wiegand | Matr.</h4>
+<h4 style="text-align: center">Götz-Henrik Wiegand | Matr. </h4>
 
 
 
@@ -9,8 +9,7 @@
 <div style="text-align: center"><small>Hochschule Karlsruhe – Technik und Wirtschaft</small></div>
 <div style="text-align: center"><small>an der</small></div>
 <div style="text-align: center"><small>Fakultät für Informatik und Wirtschaftsinformatik</small></div>
-
-
+<div style="text-align: center"><small>WS2020/21</small></div>
 
 
 
@@ -24,11 +23,16 @@ Für die Präsentation und Erklärung dieser wurde ein Command-Line-Interface(CL
 Ziel der Projektarbeit ist es, eine einsteigerfreundliche Übersicht über die Thematik zu geben und an die Ausführung und Analyse von Tests in GO heranzuführen. 
 
 ---
+
+
 ## Einleitung
-Im Rahmen der Projektarbeit wird ein Programm in Go geschrieben, an dem das GO-test-Tool vorgestellt werden soll. Hierfür werden gängige Testmethoden wie z.b. Unit-Tests gezeigt und wie diese in GO umgesetzt werden können. 
+
+Im Rahmen der Projektarbeit wird ein Programm in Go geschrieben, an dem das GO-Test-Tool vorgestellt werden soll. Hierfür werden gängige Testmethoden wie z.b. Unit-Tests gezeigt und wie diese in GO umgesetzt werden können. 
+
+Die Arbeit gliedert sich in Voraussetzungen, Tesatausführungen und Testanalyse sowie ein kurzes Fazit am Schluss. In der Vorraussetzung werden die Materialien und Methoden vorgestellt, die die Grundlage bilden, auf der die Tests ausgeführt und analysiert wurden. In der Tesausführung wird schrittweise erklärt, wie Tests in GO aus der Kommandozeile aufgerufen werden können und welche Parameter und Möglichkeiten die Sprache in dieser Hinsicht mit sich bringt. In der Testanalyse werden Tools und Möglichkeiten vorgestellt, die eigenen Tests zu analysieren und für andere bereitzustellen. In diesem Kapitel wird das Thema Benchmarks aufgrund des Umfangs der Arbeit vernachlässigt.
 
 
-## Material und Methoden
+## Voraussetzungen
 Die Programmiersprache Go wurde vor allem für das Entwickeln von skalierbaren Webanwendungen und Cloud Computing entwickelt. Neben diesen Aufgaben, hat sich GO auch als eine gängige Sprache für das Entwickeln von Command Line Interfaces (CLI) herausgestellt. 
 Mit Hilfe eines für diesen Zweck erstellten CLIs[^GitHub_Tr33Bug] werden verschiedene Beispiele dargestellt und Möglichkeiten aufgezeigt, die das Go-Testing Tool bereitstellt. Die Entwicklung des Programms sowie die Ausführung der Tests werden mithilfe von Visual Studio Code und der GO-Erweiterung[^VS Code] durchgeführt. Für die Programmierung des CLIs werden das Cobra-Framework[^GitHub_Cobra] sowie die GO eigenen Pakete[^GO-Packages] "fmt", "testing" und "strings" genutzt. Alle Testbefehle und Programmausführungen werden über den Terminal ausgeführt und beschrieben. Die Einbettung und Umsetzung der Ausführung von Tests in Grafischen Oberflächen wird hier nicht weiter berücksichtigt. 
 
@@ -210,7 +214,7 @@ Tests sind dafür da, in einem Fehlerfall fehlzuschlagen. Das kann den Entwickle
 
 Um die Tests nach dem ersten Fehlschlag zu stoppen, wird das *failfast*-Flag verwendet. In dem vierten Beispiel(`./cmd/bsp4_test.go`) ist ein Test Implementiert, der in der in jedem fall fehlschlagen sollte. In der `./cmd/bsp4_test.go`-Datei ist nach dem fehlschlagenden Test ein zweiter Test implementiert, der 4 Sekunden warten soll um ein komplexeren langen Test zu simulieren.  
 
-Bei der Ausführung der Tests ohne das *failfast*-Flag schlägt der Durchlauf nach ca.9 Sekunden fehl. Mit dem *failfast*-Flag bricht der Durchlauf sofort bei einem Fehlschlag ab und braucht damit nur ca. 5 Sekunden. Je nach Anwendungsfall muss auch hier entschieden werden, ob das schnelle Fehlschlagen gewünscht ist oder nicht.
+Bei der Ausführung der Tests ohne das *failfast*-Flag schlägt der Durchlauf nach ungefähr 9 Sekunden fehl. Mit dem *failfast*-Flag bricht der Durchlauf sofort bei einem Fehlschlag ab und braucht damit nur ungefähr 5 Sekunden. Je nach Anwendungsfall muss auch hier entschieden werden, ob das schnelle Fehlschlagen gewünscht ist oder nicht.
 
 ##### Code
 
@@ -354,15 +358,15 @@ tr33@bug:~$go test -timeout 20s ./cmd/
 
 ## Testanalyse
 
-Bei der Analyse von Tests geht es darum mithilfe von Tests aussagen über die Stabilität des Codes zu treffen oder die Aussagen der Tests für andere Programme oder Menschen darzustellen. Die hier aufgeführten Möglichkeiten sind alle eng an das Testing-Tool geknüpft und so ausgewählt. Einen breiten Teil der Testanalyse behandelt das Benchmarking, welches an dieser Stelle vernachlässigt wird. In jedem Abschnitt wird die entsprechende schrittweise Ausführung als *Ausgabe* im Terminal dokumentiert, wobei der *Code* an dieser Stelle nur bei dem *Erkennen von Wettlaufsituationen* zum Verständnis beigefügt wurde. 
+Bei der Analyse von Tests geht es darum, mithilfe von Tests aussagen über die Stabilität des Codes zu treffen oder die Aussagen der Tests für andere Programme oder Menschen darzustellen. Die hier aufgeführten Möglichkeiten sind alle eng an das Testing-Tool geknüpft und so ausgewählt. Einen breiten Teil der Testanalyse behandelt das Benchmarking, welches an dieser Stelle vernachlässigt wird. In jedem Abschnitt wird die entsprechende schrittweise Ausführung als *Ausgabe* im Terminal dokumentiert, wobei der *Code* an dieser Stelle nur bei dem *Erkennen von Wettlaufsituationen* zum Verständnis beigefügt wurde. 
 
 ### Erkennen von Wettlaufsituationen(Race Conditions)
 
-Parallelisierbarkeit ist eine der Stärken von GO und auch Tests in GO sind parallelisier bar. Bei parallelen Anwendungen kann es zu sogenannten Wettlaufsituationen(*Race Conditions*) kommen die im häufig sehr schwer zu finden sind. Eine solche "Wettlauf"-Situation entsteht immer dann, wenn einzelne Komponenten die Parallel laufen in ihrer Dauer und Reihenfolge nicht definiert sind und somit bei verschiedenen Ausführungen verschiedene Lösungen herauskommen können. Um einen solchen Fehler schnell zu erkennen kann jedes Programm in GO mit dem *Data Race Detector*[^GO-Packages_DataRaceDetector] ausgeführt werden. Um diesen Detector zu aktivieren muss die *race*-Flag(`-race`) in dem Kommando enthalten sein. Der *Data Race Detector* kann neben dem Testen auch bei der Ausführung des Programmes (`go run -race main.go`), bei dem Bauen(`go build -race main.go`) und bei dem Installieren(`go install -race main.go`) ausgeführt werden. 
+Parallelisierbarkeit ist eine der Stärken von GO und auch Tests in GO sind parallelisier bar. Bei parallelen Anwendungen kann es zu sogenannten Wettlaufsituationen(*Race Conditions*) kommen, die im häufig sehr schwer zu finden sind. Eine solche "Wettlauf"-Situation entsteht immer dann, wenn einzelne Komponenten die parallel laufen, in ihrer Dauer und Reihenfolge nicht definiert sind und somit bei verschiedenen Ausführungen verschiedene Lösungen herauskommen können. Um einen solchen Fehler schnell zu erkennen, kann jedes Programm in GO mit dem *Data Race Detector*[^GO-Packages_DataRaceDetector] ausgeführt werden. Um diesen Detector zu aktivieren, muss die *race*-Flag(`-race`) in dem Kommando enthalten sein. Der *Data Race Detector* kann neben dem Testen auch bei der Ausführung des Programmes (`go run -race main.go`), bei dem Bauen(`go build -race main.go`) und bei dem Installieren(`go install -race main.go`) ausgeführt werden. 
 
-Eine einfache Wettlaufbedingung ist wenn zwei parallele Programme in die gleiche Variable schreiben möchten. Welches Programm später in die Variable schriebt hat seinen Wert als Lösung in dieser festgehalten wobei der vorige Wert verloren geht. Um so ein Beispiel zu kre­ie­ren legen wir zunächst eine Variable an, auf welche die parallelen Tests zugreifen können(`superCount`).  Im folgenden werden zwei Funktionen erstellt, wobei eine Funktion (`countUp()`) die Variable um eins erhöht und eine Funktion (`countDown()`) die Variable um eins erniedrigt. Beide Funktionen werden nach dem Schreibvorgang der Variable ihren Wert als Log ausgeben und in der `TestStartRace()`-Funktion als Untertests(*subtests*) und parallel aufgerufen. 
+Eine einfache Wettlaufbedingung ist, wenn zwei parallele Programme in die gleiche Variable schreiben möchten. Welches Programm später in die Variable schriebt, hat seinen Wert als Lösung in dieser festgehalten, wobei der vorige Wert verloren geht. Um so ein Beispiel zu kre­ie­ren, legen wir zunächst eine Variable an, auf welche die parallelen Tests zugreifen können(`superCount`).  Im Folgenden werden zwei Funktionen erstellt, wobei eine Funktion (`countUp()`) die Variable um eins erhöht und eine Funktion (`countDown()`) die Variable um eins erniedrigt. Beide Funktionen werden nach dem Schreibvorgang der Variable ihren Wert als Log ausgeben und in der `TestStartRace()`-Funktion als Untertests(*subtests*) und parallel aufgerufen. 
 
-Der Test wird zunächst mit `go test -run=TestStartRace$ ./cmd/` ohne den *Data Race Detector* aufgerufen und wird fehlerfrei ausgeführt. Wird der *Data Race Detector* nun hinzugefügt(`go test -race -run=TestStartRace$ ./cmd/`) erscheint sofort eine Data-Race-Warnung. In der Warnung werden dem Entwickler weitere Informationen bereitgestellt wie dieser Wettlauf entstanden ist. 
+Der Test wird zunächst mit `go test -run=TestStartRace$ ./cmd/` ohne den *Data Race Detector* aufgerufen und wird fehlerfrei ausgeführt. Wird der *Data Race Detector* nun hinzugefügt(`go test -race -run=TestStartRace$ ./cmd/`) erscheint sofort eine Data-Race-Warnung. In der Warnung werden dem Entwickler weitere Informationen bereitgestellt, darüber wie die Wettlaufsituation entstanden ist. 
 
 ##### Code
 
@@ -444,13 +448,12 @@ tr33@bug:~$go test -race -run=TestStartRace$ ./cmd/
 	        bsp7_test.go:27: 0
 	        testing.go:1038: race detected during execution of test
 	FAIL
-	FAIL    github.com/Tr33Bug/myCli/cmd    0.047s
-	FAIL
+	FAIL    github.com/Tr33Bug/myCli/cmd    0.047s FAIL
 ```
 
 ### Darstellung der Testergebnisse als JSON
 
-Alle durchgeführten Tests in dieser Arbeit wurden im Terminal mit Konsolen-befehlen ausgeführt und die Ergebnisse auf diesem als Text in dem GO-eigenen Format wieder gegeben. Sollen Testergebnisse jedoch in weiteren Schritten von anderen Programmen gelesen werden, so bietet sich das *JSON*-Format an. Um die Testergebnisse in diesem Format dazustellen wird die *json*-Flag dem Testbefehl hinzugefügt (`go test -json main.go`). Um die Ausgabe an dieser Stelle etwas ein zu grenzen wird nur der Test `TestPrintHello()` aus der Datei `./cmd/bsp2_test.go` ausgeführt.
+Alle durchgeführten Tests in dieser Arbeit wurden in einer Konsole mit Befehlen ausgeführt und die Ergebnisse auf der Konsole als Text in dem GO-eigenen Format wieder gegeben. Sollen Testergebnisse jedoch in weiteren Schritten von anderen Programmen gelesen werden, so bietet sich das *JSON*-Format an. Um die Testergebnisse in diesem Format dazustellen zu lassen, wird die *json*-Flag dem Testbefehl hinzugefügt (`go test -json main.go`). Um die Ausgabe an dieser Stelle etwas ein zu grenzen, wird nur der Test `TestPrintHello()` aus der Datei `./cmd/bsp2_test.go` ausgeführt.
 
 ##### Ausgabe
 
@@ -467,17 +470,15 @@ tr33@bug:~$go test -json -run=TestPrintHello$ ./cmd/
 
 ### Testabdeckung des Codes
 
-Um ein Projekt zu prüfen und zu sehen wie viel des Quellcodes mit Tests abgedeckt ist, gibt es die *cover*-Flag. Wird diese Flag dem Kommando hinzugefügt, so wird als Ausgabe eine Prozentzahl gegeben, wie viel des Codes von Tests abgedeckt ist. In diesem Beispiel sind das 30.8% Testabdeckung. 
+Um ein Projekt zu prüfen und zu sehen, wie viel des Quellcodes mit Tests abgedeckt ist, gibt es die *cover*-Flag. Wird die *cover*-Flag dem Kommando hinzugefügt, so wird als Ausgabe eine Prozentzahl gegeben, wie viel des Codes von Tests abgedeckt ist. In diesem Beispiel sind das 30.8 % Testabdeckung. 
 
-Um noch ein besseres Verständnis zu bekommen welche Teile des Codes nicht Abgedeckt sind gibt es die Möglichkeit sogenannte Coverprofiles die exakte Testabdeckung in dem Code Anzeigen zu lassen. Dafür wird zunächst ein solches Profil mit Hilfe der *coverprofile*-Flag angelegt und als `myCoverProfile`  gespeichert. Auch bei dieser Ausgabe wird als Rückgabe neben der Testdauer und dem Teststatus die *coverage* also die Testabdeckung in Prozent gegeben. 
+Um noch ein besseres Verständnis zu bekommen, welche Teile des Codes nicht abgedeckt sind, gibt es die Möglichkeit, sogenannte Coverprofiles die exakte Testabdeckung in dem Code Anzeigen zu lassen. Dafür wird zunächst ein solches Profil mithilfe der *coverprofile*-Flag angelegt und als `myCoverProfile` gespeichert. Auch bei dieser Ausgabe wird als Rückgabe neben der Testdauer und dem Teststatus die *coverage* also die Testabdeckung in Prozent gegeben. 
 
-Ein Blick in das neu erstellte Testprofil mit `cat ./myCoverProfile` zeigt in der ersten Zeile einen Modus der gesetzt wird und in den folgenden Zeilen Informationen zu erstellten Tests mit Zahlen. Um diese Zahlen zu verstehen wird das `go tool` mit dem Argument  `cover` und genutzt. Dieses Tool bereitet das Testprofil als Darstellung auf. 
+Ein Blick in das neu erstellte Testprofil mit `cat ./myCoverProfile` zeigt in der ersten Zeile einen Modus, der gesetzt wird und in den folgenden Zeilen Informationen zu erstellten Tests mit Zahlen. Um diese Zahlen zu verstehen, wird das `go tool` mit dem Argument `cover` und genutzt. Dieses Tool bereitet das Testprofil als Darstellung auf. 
 
-Als erste Möglichkeit der Darstellung soll für jede Funktion gezeigt werden wie viel Prozent diese von Tests abgedeckt wird. Erreicht wird das mit der *func*-Flag (`go tool cover -func=myCoverProfile`) 
+Als erste Möglichkeit der Darstellung soll für jede Funktion gezeigt werden, wie viel Prozent diese von Tests abgedeckt wird. Erreicht wird das mit der *func*-Flag (`go tool cover -func=myCoverProfile`) 
 
-Eine noch detaillierte Darstellung der Testabdeckung bietet GO als HTML an. Für diese Darstellung wird wie zuvor das `go tool cover`  genutzt, nun aber mit der *html*-Flag. Nach dem Ausführen des `go tool cover -html=myCoverProfile`-Kommandos öffnet sich die HTML-Darstellung des Testprofils in einem Browser. Hier wird der Code der Anwendung gezeigt und je nach Abdeckung farbig angezeigt. Rot steht für nicht Abgedeckt und Grün steht für einen bereits abgedeckten Codebereich. Die grauen Codeteile sind im Testfall zu vernachlässigende Codeteile wie Variablendeklaration, Kommentare und weiteres. Die HTLM-Seite gibt weiter die Möglichkeit zwischen den verschiedenen Dateien, in welche das Projekt aufgeteilt ist, mit Hilfe einer Drop-Down-Liste zu navigieren. 
-
-Für weitere Informationen zu Testabdeckung siehe: 
+Eine noch detaillierte Darstellung der Testabdeckung bietet GO als HTML an. Für diese Darstellung wird wie zuvor das `go tool cover` genutzt, nun aber mit der *html*-Flag. Nach dem Ausführen des `go tool cover -html=myCoverProfile`-Kommandos öffnet sich die HTML-Darstellung des Testprofils in einem Browser. Hier wird der Code der Anwendung gezeigt und je nach Abdeckung farbig angezeigt. Rot steht für nicht abgedeckt und Grün steht für einen bereits abgedeckten Codebereich. Die grauen Codeteile sind im Testfall zu vernachlässigende Codeteile wie Variablendeklaration, Kommentare und Weiteres. Die HTLM-Seite gibt weiter die Möglichkeit zwischen den verschiedenen Dateien, in welche das Projekt aufgeteilt ist, mit Hilfe einer Drop-Down-Liste zu navigieren. 
 
 ##### Ausgabe
 
@@ -526,16 +527,14 @@ tr33@bug:~$go tool cover -html=myCoverProfile
 
 ##### Browser Darstellung der Testabdeckung
 
-![](C:\Users\Kreat\Documents\Uni\5.Semester\go\myCli\pictures\testCoverage.png)
-
-## Diskussion
-
-% Was sind vergleichbare Tools? Vor und Nachteile? (JUnit)
-% Ergebnisse diskutieren und kommentieren
+<img src="C:\Users\Kreat\Documents\Uni\5.Semester\go\myCli\pictures\testCoverage.png" alt="Dar" style="zoom:150%;" />
 
 ## Fazit und Ausblick
-% Weitere Möglichkeiten
-% Gesamtdarstellung der Ergebnisse
+Im Vergleich zu anderen Programmiersprachen bietet GO als relativ junge Programmiersprache viele spannende und einfach zu nutzende Tools, die nicht an eine grafische Oberfläche oder Entwicklungsumgebung gebunden sind. Das bietet den Vorteil, dass diese sehr einfach auf verschiedenen Plattformen genutzt werden kann, bringt aber auch mit sich, dass Entwickler sich mit etwas mit der Kommandozeile auseinandersetzen sollten. Wird der Einsatzbereich der Sprache betrachtet(Serveranwendungen und CLIs), so passt sich die Sprache in dieser Hinsicht Entwicklern und Serveradministratoren, deren gängiges Mittel die Kommandozeile ist, sehr gut an.
+
+Für unerfahrene Programmierer bietet die Sprache und ihre Tools eine sehr gute Einstiegsmöglichkeit und für fortgeschrittene eine Möglichkeit, in einfachen Codezeilen komplexe Dinge darzustellen. Dieser Ansatz kann hier analog für die Unit-Tests und Analysen übernommen werden. Dieser Ansatz ermöglicht es Entwicklern, die vorher keine oder wenige Tests geschrieben haben, schnell und einfach in der Thematik fuß zu fassen und unterstützt so in der Erstellung von stabilen und sicheren Anwendungen.
+
+Die in diesem Bericht gezeigten Möglichkeiten sind als Einstieg in die Thematik zu verstehen und sollen eine gute Grundlage vermitteln. Um das Thema weiter zu vertiefen, werden die für diese Arbeit verwendeten Quellen[^Blog_A.Edwards]`[^GO-Artikel-Einführung], die GO-Dokumentationen[^GO-Doc]´[^GO-Packages_Testing] und Vorträge der GopherCon[^GopherCon-Konferenz] empfohlen.
 
 [^VS Code]: Visual Studio Code Extension für GO: https://code.visualstudio.com/docs/languages/go
 
@@ -547,8 +546,10 @@ tr33@bug:~$go tool cover -html=myCoverProfile
 [^GitHub_Cobra]: Das Repository, in welchem das Cobra-Tool zur Erstellung von Command Line Interfaces zu finden ist: https://github.com/spf13/cobra
 
 [^Blog_A.Edwards]: Alex Edwards Blogeintrag über die verschiedenen Tools, die GO mitbringt: https://www.alexedwards.net/blog/an-overview-of-go-tooling
+[^GO-Homepage]: Die GO-Homepage: https://golang.org/
+[^GO-Doc]: Die Dokumentation der GO-Sprache: https://golang.org/doc/
 
-Artikel über GO \\
-https://entwickler.de/online/development/einfuehrung-programmierung-go-166821.html
+[^GopherCon-Konferenz]: Die Homepage der Jährlich stattfindenden GO Konferenz: https://www.gophercon.com/
+[^GO-Artikel-Einführung]: Einführung in die GO-Programmiersprache: https://entwickler.de/online/development/einfuehrung-programmierung-go-166821.html
 
 ​	
